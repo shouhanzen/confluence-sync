@@ -1,0 +1,24 @@
+[project]
+name = "confluence-sync"
+version = "0.1.0"
+description = "Tool to sync Confluence pages with local markdown files using version control"
+readme = "README.md"
+authors = [
+    { name = "User", email = "user@example.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "atlassian-python-api>=3.41.0",
+    "click>=8.1.7",
+    "pydantic>=2.5.0",
+    "pyyaml>=6.0.1",
+    "rich>=13.7.0",
+    "markdownify>=0.11.6",
+]
+
+[project.scripts]
+confluence-sync = "confluence_sync:main"
+
+[build-system]
+requires = ["uv_build>=0.8.15,<0.9.0"]
+build-backend = "uv_build"
