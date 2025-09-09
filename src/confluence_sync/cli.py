@@ -77,19 +77,37 @@ def init(ctx, non_interactive):
         except click.BadParameter as e:
             console.print(f"[red]Error: {e}[/red]")
     
-    # Get API token
-    api_token = getpass.getpass("Enter your API token/PAT (will be hidden): ")
-    if not api_token:
-        console.print("[red]API token cannot be empty[/red]")
-        return
+    # Select authentication method
+    console.print()
+    console.print("Choose your authentication method:")
+    console.print("  1) Username + API Token (most common)")
+    console.print("  2) API Token only (newer instances)")
+    console.print()
+    
+    auth_choice = click.prompt("Selection", type=click.Choice(['1', '2']), default='1')
+    
+    if auth_choice == '1':
+        # Username + API token authentication (most common)
+        username = click.prompt("Enter your email/username")
+        api_token = getpass.getpass("Enter your API token (will be hidden): ")
+        if not api_token:
+            console.print("[red]API token cannot be empty[/red]")
+            return
+    else:
+        # PAT-only authentication (newer instances)
+        api_token = getpass.getpass("Enter your API token/PAT (will be hidden): ")
+        if not api_token:
+            console.print("[red]API token cannot be empty[/red]")
+            return
+        username = None
     
     # Test connection
     console.print()
     with console.status("[yellow]Testing connection...[/yellow]"):
         try:
-            client = ConfluenceClient(url, api_token)
+            client = ConfluenceClient(url, api_token, username)
             if not client.test_connection():
-                console.print("[red]❌ Connection failed. Please check your URL and API token.[/red]")
+                console.print("[red]❌ Connection failed. Please check your credentials.[/red]")
                 return
         except Exception as e:
             console.print(f"[red]❌ Connection failed: {e}[/red]")
@@ -191,7 +209,7 @@ def init(ctx, non_interactive):
     console.print()
     
     if click.confirm("Save configuration?", default=True):
-        config.save_interactive_config(url, api_token, space_key, local_path)
+        config.save_interactive_config(url, api_token, space_key, local_path, username)
         console.print(f"[green]✅ Configuration saved to {config_path}[/green]")
         console.print()
         console.print("[bold]Next steps:[/bold]")

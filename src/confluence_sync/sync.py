@@ -46,7 +46,8 @@ class SyncManager:
         self.config = config
         self.client = ConfluenceClient(
             url=config.confluence.url,
-            api_token=config.confluence.api_token
+            api_token=config.confluence.api_token,
+            username=getattr(config.confluence, 'username', None)
         )
         self.metadata_store = MetadataStore(config.local_path / '.confluence-sync' / 'metadata.json')
         self.metadata_store.load()
@@ -163,11 +164,17 @@ class SyncManager:
             f.write(content)
         
         # Update metadata store
+        try:
+            relative_path = file_path.relative_to(Path.cwd())
+        except ValueError:
+            # If file_path is not relative to cwd, just use the file_path as-is
+            relative_path = file_path
+        
         self.metadata_store.set_page_metadata(
             page_info.id,
             page_info.title,
             page_info.version,
-            str(file_path.relative_to(Path.cwd()))
+            str(relative_path)
         )
     
     def _push_file(self, file_path: Path) -> bool:
@@ -192,11 +199,16 @@ class SyncManager:
             )
             
             # Update metadata with new version (increment by 1)
+            try:
+                relative_path = file_path.relative_to(Path.cwd())
+            except ValueError:
+                relative_path = file_path
+                
             self.metadata_store.set_page_metadata(
                 page_info.id,
                 page_info.title,
                 page_info.version + 1,
-                str(file_path.relative_to(Path.cwd()))
+                str(relative_path)
             )
         else:
             # Create new page
@@ -208,11 +220,16 @@ class SyncManager:
             )
             
             # Update metadata with new page info
+            try:
+                relative_path = file_path.relative_to(Path.cwd())
+            except ValueError:
+                relative_path = file_path
+                
             self.metadata_store.set_page_metadata(
                 result['id'],
                 page_info.title,
                 result['version']['number'],
-                str(file_path.relative_to(Path.cwd()))
+                str(relative_path)
             )
         
         return True

@@ -8,6 +8,7 @@ class ConfluenceConfig(BaseModel):
     url: str = Field(..., description="Confluence instance URL")
     api_token: str = Field(..., description="API token for authentication")
     space_key: str = Field(..., description="Confluence space key")
+    username: Optional[str] = Field(None, description="Username for legacy authentication")
 
 
 class SyncConfig(BaseModel):
@@ -48,14 +49,19 @@ class Config:
         with open(self.config_path, 'w') as f:
             yaml.dump(template, f, default_flow_style=False, indent=2)
     
-    def save_interactive_config(self, url: str, api_token: str, space_key: str, local_path: str = "docs") -> None:
+    def save_interactive_config(self, url: str, api_token: str, space_key: str, local_path: str = "docs", username: Optional[str] = None) -> None:
         """Save configuration from interactive setup"""
+        confluence_config = {
+            "url": url,
+            "api_token": api_token,
+            "space_key": space_key
+        }
+        
+        if username:
+            confluence_config["username"] = username
+        
         config_data = {
-            "confluence": {
-                "url": url,
-                "api_token": api_token,
-                "space_key": space_key
-            },
+            "confluence": confluence_config,
             "local_path": local_path,
             "ignore_patterns": [
                 "*.tmp", 

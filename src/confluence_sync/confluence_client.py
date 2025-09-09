@@ -16,12 +16,22 @@ class PageInfo:
 
 
 class ConfluenceClient:
-    def __init__(self, url: str, api_token: str):
-        self.confluence = Confluence(
-            url=url,
-            token=api_token,
-            cloud=True
-        )
+    def __init__(self, url: str, api_token: str, username: Optional[str] = None):
+        if username:
+            # Username + API token authentication
+            self.confluence = Confluence(
+                url=url,
+                username=username,
+                password=api_token,
+                cloud=True
+            )
+        else:
+            # PAT-only authentication
+            self.confluence = Confluence(
+                url=url,
+                token=api_token,
+                cloud=True
+            )
     
     def get_space_pages(self, space_key: str, limit: int = 500) -> List[Dict[str, Any]]:
         """Get all pages in a space"""
@@ -150,10 +160,12 @@ class ConfluenceClient:
     def test_connection(self) -> bool:
         """Test if credentials and connection work"""
         try:
-            # Try to get current user info to test credentials
-            self.confluence.get_current_user()
+            # Try to get all spaces as a simple test of credentials
+            spaces = self.confluence.get_all_spaces(limit=1)
+            print(f"   Authentication successful!")
             return True
-        except Exception:
+        except Exception as e:
+            print(f"   Connection error: {e}")
             return False
     
     def get_user_spaces(self) -> List[Dict[str, Any]]:

@@ -4,9 +4,24 @@ version = "0.1.0"
 description = "Tool to sync Confluence pages with local markdown files using version control"
 readme = "README.md"
 authors = [
-    { name = "User", email = "user@example.com" }
+    { name = "shouhanzen", email = "shouhanzen@gmail.com" }
 ]
-requires-python = ">=3.13"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+keywords = ["confluence", "markdown", "sync", "documentation", "atlassian"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Documentation",
+    "Topic :: Software Development :: Documentation",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
 dependencies = [
     "atlassian-python-api>=3.41.0",
     "click>=8.1.7",
@@ -17,8 +32,20 @@ dependencies = [
 ]
 
 [project.scripts]
-confluence-sync = "confluence_sync:main"
+confluence-sync = "confluence_sync.cli:cli"
+
+[project.urls]
+Homepage = "https://github.com/shouhanzen/confluence-sync"
+Repository = "https://github.com/shouhanzen/confluence-sync"
+Issues = "https://github.com/shouhanzen/confluence-sync/issues"
 
 [build-system]
 requires = ["uv_build>=0.8.15,<0.9.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "build>=1.3.0",
+    "python-dotenv>=1.1.1",
+    "twine>=6.2.0",
+]
